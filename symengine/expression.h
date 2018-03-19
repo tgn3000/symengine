@@ -166,6 +166,47 @@ public:
     {
         return m_basic;
     }
+
+    //! Overload Sin
+    friend Expression sin(const Expression &a)
+    {
+      return Expression(sin(a.m_basic));
+    }
+    //! Overload Cos
+    friend Expression cos(const Expression &a)
+    {
+      return Expression(cos(a.m_basic));
+    }
+    //! Overload Tan
+    friend Expression tan(const Expression &a)
+    {
+      return Expression(tan(a.m_basic));
+    }
+    //! Overload Asin
+    friend Expression asin(const Expression &a)
+    {
+      return Expression(asin(a.m_basic));
+    }
+    //! Overload Acos
+    friend Expression acos(const Expression &a)
+    {
+      return Expression(acos(a.m_basic));
+    }
+    //! Overload Atan
+    friend Expression atan(const Expression &a)
+    {
+      return Expression(atan(a.m_basic));
+    }
+    //! Overload Atan2
+    friend Expression atan2(const Expression &a, const Expression &b)
+    {
+      return Expression(atan2(a.m_basic, b.m_basic));
+    }
+    //! Overload Abs
+    friend Expression abs(const Expression &a)
+    {
+      return Expression(abs(a.m_basic));
+    }    
 };
 
 inline Expression pow_ex(const Expression &base, const Expression &exp)
