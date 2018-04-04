@@ -206,7 +206,12 @@ public:
     friend Expression abs(const Expression &a)
     {
       return Expression(abs(a.m_basic));
-    }    
+    }
+    //! Overload Sqrt
+    friend Expression sqrt(const Expression &a)
+    {
+      return Expression(sqrt(a.m_basic));
+    }   
 };
 
 inline Expression pow_ex(const Expression &base, const Expression &exp)
