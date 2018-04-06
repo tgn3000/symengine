@@ -166,6 +166,7 @@ public:
     {
         return m_basic;
     }
+  /* TGN adds the following */
 
     //! Overload Sin
     friend Expression sin(const Expression &a)
@@ -211,8 +212,43 @@ public:
     friend Expression sqrt(const Expression &a)
     {
       return Expression(sqrt(a.m_basic));
-    }   
+    }
 };
+
+//! Our hash:
+struct ExpressionHash {
+    //! Returns the hashed value.
+    size_t operator()(const Expression &k_ex) const
+    {
+      const RCP<const Basic> k = k_ex.get_basic();
+      return k->hash();
+    }
+};  
+
+//! Our comparison `(==)`
+struct ExpressionKeyEq {
+    //! Comparison Operator `==`
+    bool operator()(const Expression &x_ex, const Expression &y_ex) const
+    {
+      const RCP<const Basic> x = x_ex.get_basic(), y = y_ex.get_basic();
+      return eq(*x, *y);
+    }
+};
+
+//! Our less operator `(<)`:
+struct ExpressionKeyLess {
+    //! true if `x < y`, false otherwise
+    bool operator()(const Expression &x_ex, const Expression &y_ex) const
+    {
+      const RCP<const Basic> x = x_ex.get_basic(), y = y_ex.get_basic();      
+      hash_t xh = x->hash(), yh = y->hash();
+        if (xh != yh)
+            return xh < yh;
+        if (eq(*x, *y))
+            return false;
+        return x->__cmp__(*y) == -1;
+    }
+};  
 
 inline Expression pow_ex(const Expression &base, const Expression &exp)
 {
