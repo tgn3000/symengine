@@ -13,6 +13,8 @@
 #include <mpfr.h>
 #endif // HAVE_SYMENGINE_MPFR
 
+#include "symengine/symengine_exception.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,8 +29,6 @@ extern "C" {
             abort();                                                           \
         }                                                                      \
     }
-
-#include "symengine/symengine_exception.h"
 
 typedef symengine_exceptions_t CWRAPPER_OUTPUT_TYPE;
 
@@ -592,6 +592,9 @@ size_t mapbasicbasic_size(CMapBasicBasic *self);
 CWRAPPER_OUTPUT_TYPE basic_get_args(const basic self, CVecBasic *args);
 //! Returns a CSetBasic of set_basic given by free_symbols
 CWRAPPER_OUTPUT_TYPE basic_free_symbols(const basic self, CSetBasic *symbols);
+//! Returns a CSetBasic of set_basic given by function_symbols
+CWRAPPER_OUTPUT_TYPE basic_function_symbols(CSetBasic *symbols,
+                                            const basic self);
 //! returns the hash of the Basic object
 size_t basic_hash(const basic self);
 //! substitutes all the keys with their mapped values
@@ -607,6 +610,8 @@ CWRAPPER_OUTPUT_TYPE basic_subs2(basic s, const basic e, const basic a,
 //! symbols arg
 CWRAPPER_OUTPUT_TYPE function_symbol_set(basic s, const char *c,
                                          const CVecBasic *arg);
+//! Returns the name of the given FunctionSymbol
+char *function_symbol_get_name(const basic b);
 //! Returns the coefficient of x^n in b
 CWRAPPER_OUTPUT_TYPE basic_coeff(basic c, const basic b, const basic x,
                                  const basic n);
