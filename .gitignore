@@ -157,3 +157,7 @@ symengine/ruby/callgrind.out.*
 
 *#*
 *~*
+
+symengine/html/
+
+symengine/latex/

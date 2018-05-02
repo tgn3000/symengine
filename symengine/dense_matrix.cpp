@@ -81,6 +81,17 @@ void DenseMatrix::inv(MatrixBase &result) const
     }
 }
 
+// symbol substitution
+void DenseMatrix::subs(const map_basic_basic& m, MatrixBase &result) const
+{
+  result = *this;
+  for (unsigned int i = 0; i < row_; i++) {
+    for (unsigned int j = 0; j < col_; j++) {
+      result.set(i, j, this->get(i, j)->subs(m));
+    }
+  }
+}
+
 void DenseMatrix::add_matrix(const MatrixBase &other, MatrixBase &result) const
 {
     SYMENGINE_ASSERT(row_ == result.nrows() and col_ == result.ncols());
