@@ -95,6 +95,40 @@ inline RCP<const Dummy> dummy(const std::string &name)
     return make_rcp<const Dummy>(name);
 }
 
+//! Our hash:
+struct RCPSymbolHash {
+    //! Returns the hashed value.
+    size_t operator()(const RCP<const Symbol> &k) const
+    {
+        return k->hash();
+    }
+};
+
+//! Our comparison `(==)`
+struct RCPSymbolKeyEq {
+    //! Comparison Operator `==`
+    bool operator()(const RCP<const Symbol> &x, const RCP<const Symbol> &y) const
+    {
+        // const RCP<const Basic> x = x_s, y = y_s;
+        return eq(*x, *y);
+    }
+};
+
+//! Our less operator `(<)`:
+struct RCPSymbolKeyLess {
+    //! true if `x < y`, false otherwise
+    bool operator()(const RCP<const Symbol> &x, const RCP<const Symbol> &y) const
+    {
+        // const RCP<const Basic> x = x_s, y = y_s;      
+        hash_t xh = x->hash(), yh = y->hash();
+        if (xh != yh)
+            return xh < yh;
+        if (eq(*x, *y))
+            return false;
+        return x->__cmp__(*y) == -1;
+    }
+};  
+
 } // SymEngine
 
 #endif
