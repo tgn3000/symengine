@@ -10,7 +10,7 @@ SymEngineConfig.cmake
 SymEngineConfigVersion.cmake
 SymEngineTargets.cmake
 
-# cotire
+# Cotire
 symengine/cotire
 symengine/symengine_CXX_cotire.cmake
 
@@ -142,7 +142,7 @@ benchmarks/series_expansion_sincos_flint
 benchmarks/ntheorybench
 benchmarks/symengine_bench
 
-#rubygem
+# Rubygem
 symengine/ruby/Gemfile.lock
 symengine/ruby/LICENSE
 symengine/ruby/*.bundle
@@ -155,9 +155,15 @@ symengine/ruby/notebooks/.ipynb_checkpoints/
 symengine/ruby/notebooks/Gemfile.lock
 symengine/ruby/callgrind.out.*
 
+# Files generated from cmake templates
+symengine/symengine_config.h
+symengine/symengine_config_cling.h
+
+# Jupyter artefacts
+.ipynb_checkpoints/
+
+# TGN's gitignore
 *#*
 *~*
-
 symengine/html/
-
 symengine/latex/
