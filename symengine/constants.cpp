@@ -9,20 +9,16 @@ namespace SymEngine
 
 class TGNConstants {
  public:
-  static RCP<const Integer> one, minus_one;
-  static void Initialize() {
-    one = integer(1);
-    minus_one = integer(-1);
-  }
+  static const RCP<const Integer> one, minus_one;
 };
 
-class StaticTGNConstants {
- public:
-  StaticTGNConstants() { TGNConstants::Initialize(); }
-};  
-
-RCP<const Integer> TGNConstants::one, TGNConstants::minus_one;
-StaticTGNConstants statictgnconstants;
+  const RCP<const Integer> TGNConstants::one = integer(1), TGNConstants::minus_one = integer(-1);
+// class StaticTGNConstants {
+// public:
+//   StaticTGNConstants() { TGNConstants::Initialize(); }
+// };
+// static const StaticTGNConstants statictgnconstants; 
+  
 const RCP<const Integer> &tgn_one = TGNConstants::one,
   &tgn_minus_one = TGNConstants::minus_one;
 
