@@ -338,7 +338,7 @@ void Mul::as_base_exp(const RCP<const Basic> &self,
         *base = down_cast<const Pow &>(*self).get_base();
     } else {
         SYMENGINE_ASSERT(not is_a<Mul>(*self));
-        *exp = integer(1);
+        *exp = tgn_one;
         *base = self;
     }
 }
@@ -346,7 +346,7 @@ void Mul::as_base_exp(const RCP<const Basic> &self,
 RCP<const Basic> mul(const RCP<const Basic> &a, const RCP<const Basic> &b)
 {
     SymEngine::map_basic_basic d;
-    RCP<const Number> coef = integer(1);
+    RCP<const Number> coef = tgn_one;
     if (is_a<Mul>(*a) and is_a<Mul>(*b)) {
         RCP<const Mul> A = rcp_static_cast<const Mul>(a);
         RCP<const Mul> B = rcp_static_cast<const Mul>(b);
@@ -436,7 +436,7 @@ RCP<const Basic> div(const RCP<const Basic> &a, const RCP<const Basic> &b)
 
 RCP<const Basic> neg(const RCP<const Basic> &a)
 {
-    return mul(integer(-1), a);
+    return mul(tgn_minus_one, a);
 }
 
 void Mul::power_num(const Ptr<RCP<const Number>> &coef, map_basic_basic &d,
