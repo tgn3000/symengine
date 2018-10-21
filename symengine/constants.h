@@ -75,8 +75,6 @@ extern SYMENGINE_EXPORT RCP<const Infty> ComplexInf;
 
 // Not a Number
 extern SYMENGINE_EXPORT RCP<const NaN> Nan;
-
-extern const RCP<const Integer> &tgn_one, &tgn_minus_one;
 } // SymEngine
 
 #endif

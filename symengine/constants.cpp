@@ -7,21 +7,6 @@
 namespace SymEngine
 {
 
-class TGNConstants {
- public:
-  static const RCP<const Integer> one, minus_one;
-};
-
-  const RCP<const Integer> TGNConstants::one = integer(1), TGNConstants::minus_one = integer(-1);
-// class StaticTGNConstants {
-// public:
-//   StaticTGNConstants() { TGNConstants::Initialize(); }
-// };
-// static const StaticTGNConstants statictgnconstants; 
-  
-const RCP<const Integer> &tgn_one = TGNConstants::one,
-  &tgn_minus_one = TGNConstants::minus_one;
-
 Constant::Constant(const std::string &name) : name_{name}
 {
     SYMENGINE_ASSIGN_TYPEID()
