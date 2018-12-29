@@ -42,7 +42,6 @@ set(SRC
     infinity.cpp
     integer.cpp
     logic.cpp
-    mathml.cpp
     matrix.cpp
     monomials.cpp
     mul.cpp
@@ -59,7 +58,10 @@ set(SRC
     polys/uintpoly.cpp
     polys/uratpoly.cpp
     pow.cpp
-    printer.cpp
+    printers/codegen.cpp
+    printers/mathml.cpp
+    printers/strprinter.cpp
+    printers/latex.cpp
     rational.cpp
     real_double.cpp
     rewrite.cpp
@@ -114,7 +116,6 @@ set(HEADERS
     basic.h
     basic-inl.h
     basic-methods.inc
-    codegen.h
     complex_double.h
     complex.h
     complex_mpc.h
@@ -138,7 +139,6 @@ set(HEADERS
     lambda_double.h
     llvm_double.h
     logic.h
-    mathml.h
     matrix.h
     monomials.h
     mp_class.h
@@ -158,7 +158,11 @@ set(HEADERS
     polys/usymenginepoly.h
     polys/msymenginepoly.h
     pow.h
-    printer.h
+    printers/codegen.h
+    printers/mathml.h
+    printers/strprinter.h
+    printers/latex.h
+    printers.h
     rational.h
     real_double.h
     real_mpfr.h
@@ -220,14 +224,23 @@ if (NO_WARN_IMPLICIT_FALL_THROUGH_FLAG)
     set_source_files_properties(parser/scanner.cpp PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-implicit-fallthrough")
 endif()
 
-if (WITH_LLVM AND EXCLUDE_LIBS AND NOT SYMENGINE_LLVM_SHARED)
-    set_property(TARGET symengine APPEND_STRING PROPERTY LINK_FLAGS "-Wl,--exclude-libs,ALL")
-endif()
-
 if (WITH_SYMENGINE_TEUCHOS)
     target_link_libraries(symengine teuchos)
 endif()
 target_link_libraries(symengine ${LIBS})
+
+if (WITH_LLVM AND EXCLUDE_LIBS AND NOT SYMENGINE_LLVM_SHARED)
+    get_target_property(OUT symengine INTERFACE_LINK_LIBRARIES)
+    message(STATUS ${OUT})
+    set(EXCLUDE_LIBS_FLAGS "")
+    foreach(LLVM_LIB ${llvm_libs})
+        get_target_property(${LLVM_LIB}_IMPORT_LOCATION ${LLVM_LIB} LOCATION)
+        if (NOT "${${LLVM_LIB}_IMPORT_LOCATION}" MATCHES "NOTFOUND")
+            set(EXCLUDE_LIBS_FLAGS "${EXCLUDE_LIBS_FLAGS} -Wl,--exclude-libs,${${LLVM_LIB}_IMPORT_LOCATION}")
+        endif()
+    endforeach()
+    set_property(TARGET symengine APPEND_STRING PROPERTY LINK_FLAGS "${EXCLUDE_LIBS_FLAGS}")
+endif()
 
 include(GNUInstallDirs)
 
