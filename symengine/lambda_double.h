@@ -511,6 +511,26 @@ public:
         };
     };
 
+    void bvisit(const Sign &x)
+    {
+        fn tmp = apply(*(x.get_arg()));
+        result_ = [=](const double *x) {
+            return tmp(x) == 0.0 ? 0.0 : (tmp(x) < 0.0 ? -1.0 : 1.0);
+        };
+    };
+
+    void bvisit(const Floor &x)
+    {
+        fn tmp = apply(*(x.get_arg()));
+        result_ = [=](const double *x) { return std::floor(tmp(x)); };
+    };
+
+    void bvisit(const Ceiling &x)
+    {
+        fn tmp = apply(*(x.get_arg()));
+        result_ = [=](const double *x) { return std::ceil(tmp(x)); };
+    };
+
     void bvisit(const Infty &x)
     {
         if (x.is_negative_infinity()) {
@@ -570,10 +590,10 @@ public:
 
     void bvisit(const Piecewise &pw)
     {
-        if (neq(*pw.get_vec().back().second, *boolTrue)) {
-            throw SymEngineException(
-                "LambdaDouble requires a (Expr, True) at the end of Piecewise");
-        }
+        SYMENGINE_ASSERT_MSG(
+            eq(*pw.get_vec().back().second, *boolTrue),
+            "LambdaDouble requires a (Expr, True) at the end of Piecewise");
+
         std::vector<fn> applys;
         std::vector<fn> preds;
         for (const auto &expr_pred : pw.get_vec()) {
@@ -586,6 +606,8 @@ public:
                     return applys[i](x);
                 }
             }
+            throw SymEngineException(
+                "Unexpectedly reached end of Piecewise function.");
         };
     }
 };

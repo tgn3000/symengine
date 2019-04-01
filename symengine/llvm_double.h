@@ -16,6 +16,10 @@ class ExecutionEngine;
 class MemoryBufferRef;
 class LLVMContext;
 class Pass;
+namespace legacy
+{
+class FunctionPassManager;
+}
 }
 
 namespace SymEngine
@@ -31,7 +35,9 @@ protected:
     std::map<RCP<const Basic>, llvm::Value *, RCPBasicKeyLess>
         replacement_symbol_ptrs;
     llvm::Value *result_;
-    llvm::ExecutionEngine *executionengine;
+    std::shared_ptr<llvm::LLVMContext> context;
+    std::shared_ptr<llvm::ExecutionEngine> executionengine;
+    std::shared_ptr<llvm::legacy::FunctionPassManager> fpm;
     intptr_t func;
 
     // Following are invalid after the init call.
@@ -58,7 +64,8 @@ public:
 
     // Helper functions
     void set_double(double d);
-    llvm::Function *get_external_function(const std::string &name);
+    llvm::Function *get_external_function(const std::string &name,
+                                          size_t nargs = 1);
     llvm::Function *get_powi();
 
     void bvisit(const Integer &x, bool as_int32 = false);
@@ -81,6 +88,7 @@ public:
     void bvisit(const ASin &x);
     void bvisit(const ACos &x);
     void bvisit(const ATan &x);
+    void bvisit(const ATan2 &x);
     void bvisit(const Sinh &x);
     void bvisit(const Cosh &x);
     void bvisit(const Tanh &x);
@@ -105,6 +113,9 @@ public:
     void bvisit(const Min &x);
     void bvisit(const Contains &x);
     void bvisit(const Infty &x);
+    void bvisit(const Floor &x);
+    void bvisit(const Ceiling &x);
+    void bvisit(const Sign &x);
     // Return the compiled function as a binary string which can be loaded using
     // `load`
     const std::string &dumps() const;
