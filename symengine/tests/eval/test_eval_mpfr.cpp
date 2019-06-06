@@ -55,6 +55,8 @@ using SymEngine::Catalan;
 using SymEngine::GoldenRatio;
 using SymEngine::pow;
 using SymEngine::gamma;
+using SymEngine::uppergamma;
+using SymEngine::lowergamma;
 using SymEngine::beta;
 using SymEngine::constant;
 using SymEngine::NotImplementedError;
@@ -194,13 +196,22 @@ TEST_CASE("precision: eval_mpfr", "[eval_mpfr]")
                         1.76274717403909),
         std::make_tuple(gamma(div(arg1, integer(3))), 1.35411793942640,
                         1.35411793942641),
-        std::make_tuple(gamma(add(arg1, arg2)), -100, 100),
-        std::make_tuple(gamma(arg1), -100, 100),
-        std::make_tuple(gamma(add(add(arg1, arg2), arg1)), -100, 100),
+        std::make_tuple(gamma(arg2), 3.62560990822190, 3.62560990822191),
+        std::make_tuple(gamma(add(arg1, arg2)), 1.13300309631934,
+                        1.13300309631935),
+        std::make_tuple(gamma(add(add(arg1, arg2), arg1)), 8.28508514183522,
+                        8.28508514183523),
+#if MPFR_VERSION_MAJOR > 3
+        std::make_tuple(uppergamma(sqrt(integer(2)), arg2), 0.80040012955715,
+                        0.80040012955716),
+        std::make_tuple(lowergamma(sqrt(integer(2)), arg2), 0.08618129916210,
+                        0.08618129916211),
+#endif
         std::make_tuple(beta(add(arg1, arg2), arg1), 0.13675213675213,
                         0.13675213675214),
         std::make_tuple(abs((neg(sqrt(add(arg2, arg2))))), 0.70710678118654,
-                        0.70710678118655)};
+                        0.70710678118655)
+    };
 
     for (unsigned i = 0; i < testvec.size(); i++) {
         eval_mpfr(a, *std::get<0>(testvec[i]), MPFR_RNDN);
