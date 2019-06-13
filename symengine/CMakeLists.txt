@@ -20,6 +20,8 @@ if (WITH_GENERATE_PARSER)
                      )
 endif()
 
+add_subdirectory(utilities/matchpycpp)
+
 set(SRC
     add.cpp
     basic.cpp
@@ -220,10 +222,10 @@ endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set_target_properties(symengine PROPERTIES COMPILE_FLAGS "-Wconversion -Wno-sign-conversion")
-    set_source_files_properties(parser/parser.cpp parser/scanner.cpp PROPERTIES COMPILE_FLAGS "-Wno-conversion")
+    set_source_files_properties(parser/parser.cpp parser/scanner.cpp PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-extra")
 endif()
 if (NO_WARN_IMPLICIT_FALL_THROUGH_FLAG)
-    set_source_files_properties(parser/scanner.cpp PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-implicit-fallthrough")
+    set_source_files_properties(parser/scanner.cpp PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-extra -Wno-implicit-fallthrough")
 endif()
 
 if (WITH_SYMENGINE_TEUCHOS)
@@ -261,4 +263,6 @@ INSTALL_HEADERS_WITH_DIRECTORY(HEADERS)
 if (BUILD_TESTS)
     add_subdirectory(utilities/catch)
     add_subdirectory(tests)
+    add_subdirectory(utilities/matchpycpp/tests)
+    add_subdirectory(utilities/matchpycpp/autogen_tests)
 endif()

@@ -471,7 +471,7 @@ void LatexPrinter::_print_pow(std::ostringstream &o, const RCP<const Basic> &a,
                               const RCP<const Basic> &b)
 {
     if (eq(*a, *E)) {
-        o << "e^\\{" << apply(a) << "}";
+        o << "e^{" << apply(b) << "}";
     } else if (eq(*b, *rational(1, 2))) {
         o << "\\sqrt{" << apply(a) << "}";
     } else if (is_a<Rational>(*b)
@@ -481,10 +481,11 @@ void LatexPrinter::_print_pow(std::ostringstream &o, const RCP<const Basic> &a,
     } else {
         o << parenthesizeLE(a, PrecedenceEnum::Pow);
         Precedence prec;
-        if (prec.getPrecedence(b) <= PrecedenceEnum::Pow) {
-            o << "^{" << apply(b) << "}";
+        auto b_str = apply(b);
+        if (b_str.size() > 1) {
+            o << "^{" << b_str << "}";
         } else {
-            o << "^" << apply(b);
+            o << "^" << b_str;
         }
     }
 }
