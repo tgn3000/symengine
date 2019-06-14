@@ -5,7 +5,7 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE ${CMAKE_SOURCE_DIR}/cmake/UserOverride.cmake)
 project(symengine)
 
 set(SYMENGINE_MAJOR_VERSION 0)
-set(SYMENGINE_MINOR_VERSION 3)
+set(SYMENGINE_MINOR_VERSION 4)
 set(SYMENGINE_PATCH_VERSION 0)
 set(SYMENGINE_VERSION ${SYMENGINE_MAJOR_VERSION}.${SYMENGINE_MINOR_VERSION}.${SYMENGINE_PATCH_VERSION})
 
@@ -91,7 +91,7 @@ endif()
 if (${EXCLUDE_LIBS})
     message(STATUS "Linker supports --exclude-libs")
 else()
-    message(STATUS "Linker does not support --exclude-libs ${EXCLUDE_LIBS_ERROR_LOG}")
+    message(STATUS "Linker does not support --exclude-libs")
 endif()
 
 set(HAVE_GCC_ABI_DEMANGLE yes
@@ -611,6 +611,7 @@ export(TARGETS ${SYMENGINE_TARGETS} FILE "${PROJECT_BINARY_DIR}/SymEngineTargets
 foreach(PKG ${PKGS})
     set(SYMENGINE_PKG_FINDS "${SYMENGINE_PKG_FINDS}\nset(SYMENGINE_${PKG}_LIBRARIES ${${PKG}_LIBRARIES})")
     set(SYMENGINE_PKG_FINDS "${SYMENGINE_PKG_FINDS}\nset(SYMENGINE_${PKG}_INCLUDE_DIRS ${${PKG}_INCLUDE_DIRS})")
+    set(SYMENGINE_PKG_FINDS "${SYMENGINE_PKG_FINDS}\nset(HAVE_SYMENGINE_${PKG} True)")
 endforeach()
 
 # ... for the build tree

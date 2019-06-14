@@ -181,21 +181,21 @@ void LLVMDoubleVisitor::init(const vec_basic &inputs, const vec_basic &outputs,
                              const bool symbolic_cse,
                              const std::vector<llvm::Pass *> &passes)
 {
+    executionengine.reset();
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
     llvm::InitializeNativeTargetAsmParser();
-    std::unique_ptr<llvm::LLVMContext> context
-        = llvm::make_unique<llvm::LLVMContext>();
+    context = std::make_shared<llvm::LLVMContext>();
     symbols = inputs;
 
     // Create some module to put our function into it.
     std::unique_ptr<llvm::Module> module
-        = llvm::make_unique<llvm::Module>("SymEngine", *context);
+        = llvm::make_unique<llvm::Module>("SymEngine", *context.get());
     module->setDataLayout("");
     mod = module.get();
 
     // Create a new pass manager attached to it.
-    auto fpm = llvm::make_unique<llvm::legacy::FunctionPassManager>(mod);
+    fpm = std::make_shared<llvm::legacy::FunctionPassManager>(mod);
     for (auto pass : passes) {
         fpm->add(pass);
     }
@@ -290,11 +290,12 @@ void LLVMDoubleVisitor::init(const vec_basic &inputs, const vec_basic &outputs,
 
     // Now we create the JIT.
     std::string error;
-    auto executionengine = llvm::EngineBuilder(std::move(module))
-                               .setEngineKind(llvm::EngineKind::Kind::JIT)
-                               .setOptLevel(llvm::CodeGenOpt::Level::Aggressive)
-                               .setErrorStr(&error)
-                               .create();
+    executionengine = std::shared_ptr<llvm::ExecutionEngine>(
+        llvm::EngineBuilder(std::move(module))
+            .setEngineKind(llvm::EngineKind::Kind::JIT)
+            .setOptLevel(llvm::CodeGenOpt::Level::Aggressive)
+            .setErrorStr(&error)
+            .create());
 
     // This is a hack to get the MemoryBuffer of a compiled object.
     class MemoryBufferRefCallback : public llvm::ObjectCache
@@ -327,6 +328,9 @@ void LLVMDoubleVisitor::init(const vec_basic &inputs, const vec_basic &outputs,
 
     // Get the symbol's address
     func = (intptr_t)executionengine->getPointerToFunction(F);
+    symbol_ptrs.clear();
+    replacement_symbol_ptrs.clear();
+    symbols.clear();
 }
 
 double LLVMDoubleVisitor::call(const std::vector<double> &vec)
@@ -575,6 +579,17 @@ void LLVMDoubleVisitor::bvisit(const Piecewise &x)
     result_ = phi_node;
 }
 
+void LLVMDoubleVisitor::bvisit(const Sign &x)
+{
+    const auto x2 = x.get_arg();
+    PiecewiseVec new_pw;
+    new_pw.push_back({real_double(0.0), Eq(x2, real_double(0.0))});
+    new_pw.push_back({real_double(-1.0), Lt(x2, real_double(0.0))});
+    new_pw.push_back({real_double(1.0), boolTrue});
+    auto pw = rcp_static_cast<const Piecewise>(piecewise(std::move(new_pw)));
+    bvisit(*pw);
+}
+
 void LLVMDoubleVisitor::bvisit(const Contains &cts)
 {
     llvm::Value *expr = apply(*cts.get_expr());
@@ -674,30 +689,46 @@ SYMENGINE_RELATIONAL_FUNCTION(Unequality, CreateFCmpONE);
 SYMENGINE_RELATIONAL_FUNCTION(LessThan, CreateFCmpOLE);
 SYMENGINE_RELATIONAL_FUNCTION(StrictLessThan, CreateFCmpOLT);
 
-#define ONE_ARG_EXTERNAL_FUNCTION(Class, ext)                                  \
+#define SYMENGINE_MACRO_EXTERNAL_FUNCTION(Class, ext)                          \
     void LLVMDoubleVisitor::bvisit(const Class &x)                             \
     {                                                                          \
-        llvm::Function *func = get_external_function(#ext);                    \
-        auto r = builder->CreateCall(func, {apply(*x.get_arg())});             \
+        vec_basic basic_args = x.get_args();                                   \
+        llvm::Function *func = get_external_function(#ext, basic_args.size()); \
+        std::vector<llvm::Value *> args;                                       \
+        for (const auto &arg : basic_args) {                                   \
+            args.push_back(apply(*arg));                                       \
+        }                                                                      \
+        auto r = builder->CreateCall(func, args);                              \
         r->setTailCall(true);                                                  \
         result_ = r;                                                           \
     }
 
-ONE_ARG_EXTERNAL_FUNCTION(Abs, abs)
-ONE_ARG_EXTERNAL_FUNCTION(Tan, tan)
-ONE_ARG_EXTERNAL_FUNCTION(Sinh, sinh)
-ONE_ARG_EXTERNAL_FUNCTION(Cosh, cosh)
-ONE_ARG_EXTERNAL_FUNCTION(Tanh, tanh)
-ONE_ARG_EXTERNAL_FUNCTION(ASinh, asinh)
-ONE_ARG_EXTERNAL_FUNCTION(ACosh, acosh)
-ONE_ARG_EXTERNAL_FUNCTION(ATanh, atanh)
-ONE_ARG_EXTERNAL_FUNCTION(ASin, asin)
-ONE_ARG_EXTERNAL_FUNCTION(ACos, acos)
-ONE_ARG_EXTERNAL_FUNCTION(ATan, atan)
-ONE_ARG_EXTERNAL_FUNCTION(Gamma, tgamma)
-ONE_ARG_EXTERNAL_FUNCTION(LogGamma, lgamma)
-ONE_ARG_EXTERNAL_FUNCTION(Erf, erf)
-ONE_ARG_EXTERNAL_FUNCTION(Erfc, erfc)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(Tan, tan)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(Sinh, sinh)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(Cosh, cosh)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(Tanh, tanh)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(ASinh, asinh)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(ACosh, acosh)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(ATanh, atanh)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(ASin, asin)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(ACos, acos)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(ATan, atan)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(Gamma, tgamma)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(LogGamma, lgamma)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(Erf, erf)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(Erfc, erfc)
+SYMENGINE_MACRO_EXTERNAL_FUNCTION(ATan2, atan2)
+
+void LLVMDoubleVisitor::bvisit(const Abs &x)
+{
+    std::vector<llvm::Value *> args;
+    llvm::Function *fun;
+    args.push_back(apply(*x.get_arg()));
+    fun = get_double_intrinsic(llvm::Intrinsic::fabs, 1, mod);
+    auto r = builder->CreateCall(fun, args);
+    r->setTailCall(true);
+    result_ = r;
+}
 
 void LLVMDoubleVisitor::bvisit(const Min &x)
 {
@@ -759,10 +790,10 @@ void LLVMDoubleVisitor::bvisit(const Symbol &x)
 }
 
 llvm::Function *
-LLVMDoubleVisitor::get_external_function(const std::string &name)
+LLVMDoubleVisitor::get_external_function(const std::string &name, size_t nargs)
 {
-    std::vector<llvm::Type *> func_args;
-    func_args.push_back(llvm::Type::getDoubleTy(mod->getContext()));
+    std::vector<llvm::Type *> func_args(
+        nargs, llvm::Type::getDoubleTy(mod->getContext()));
     llvm::FunctionType *func_type
         = llvm::FunctionType::get(llvm::Type::getDoubleTy(mod->getContext()),
                                   func_args, /*isVarArgs=*/false);
@@ -815,8 +846,7 @@ void LLVMDoubleVisitor::loads(const std::string &s)
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
     llvm::InitializeNativeTargetAsmParser();
-    std::unique_ptr<llvm::LLVMContext> context
-        = llvm::make_unique<llvm::LLVMContext>();
+    context = std::make_shared<llvm::LLVMContext>();
 
     // Create some module to put our function into it.
     std::unique_ptr<llvm::Module> module
@@ -831,11 +861,12 @@ void LLVMDoubleVisitor::loads(const std::string &s)
     auto F = get_function_type(context.get());
 
     std::string error;
-    auto executionengine = llvm::EngineBuilder(std::move(module))
-                               .setEngineKind(llvm::EngineKind::Kind::JIT)
-                               .setOptLevel(llvm::CodeGenOpt::Level::Aggressive)
-                               .setErrorStr(&error)
-                               .create();
+    executionengine = std::shared_ptr<llvm::ExecutionEngine>(
+        llvm::EngineBuilder(std::move(module))
+            .setEngineKind(llvm::EngineKind::Kind::JIT)
+            .setOptLevel(llvm::CodeGenOpt::Level::Aggressive)
+            .setErrorStr(&error)
+            .create());
 
     class MCJITObjectLoader : public llvm::ObjectCache
     {
@@ -864,6 +895,28 @@ void LLVMDoubleVisitor::loads(const std::string &s)
     executionengine->finalizeObject();
     // Set func to compiled function pointer
     func = (intptr_t)executionengine->getPointerToFunction(F);
+}
+
+void LLVMDoubleVisitor::bvisit(const Floor &x)
+{
+    std::vector<llvm::Value *> args;
+    llvm::Function *fun;
+    args.push_back(apply(*x.get_arg()));
+    fun = get_double_intrinsic(llvm::Intrinsic::floor, 1, mod);
+    auto r = builder->CreateCall(fun, args);
+    r->setTailCall(true);
+    result_ = r;
+}
+
+void LLVMDoubleVisitor::bvisit(const Ceiling &x)
+{
+    std::vector<llvm::Value *> args;
+    llvm::Function *fun;
+    args.push_back(apply(*x.get_arg()));
+    fun = get_double_intrinsic(llvm::Intrinsic::ceil, 1, mod);
+    auto r = builder->CreateCall(fun, args);
+    r->setTailCall(true);
+    result_ = r;
 }
 
 } // namespace SymEngine
