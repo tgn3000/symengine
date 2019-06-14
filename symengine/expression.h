@@ -349,7 +349,7 @@ struct ExpressionKeyLess {
     }
 };  
 
-inline Expression pow_ex(const Expression &base, const Expression &exp)
+inline Expression pow(const Expression &base, const Expression &exp)
 {
     return pow(base.get_basic(), exp.get_basic());
 }
