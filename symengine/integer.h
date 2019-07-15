@@ -185,22 +185,24 @@ public:
         throw NotImplementedError("Not Implemented");
     };
 
-  friend bool operator<(const RCP<const Integer> &a,
-                    const RCP<const Integer> &b)
+    friend bool operator<(const RCP<const Integer> &a,
+                          const RCP<const Integer> &b)
     {
         return a->as_integer_class() < b->as_integer_class();
     }
-  friend bool operator==(const RCP<const Integer> &a,
-                    const RCP<const Integer> &b)
+
+    friend bool operator==(const RCP<const Integer> &a,
+                           const RCP<const Integer> &b)
     {
         return a->as_integer_class() == b->as_integer_class();
     }
-  friend bool operator>(const RCP<const Integer> &a,
-                    const RCP<const Integer> &b)
+
+    friend bool operator>(const RCP<const Integer> &a,
+                          const RCP<const Integer> &b)
     {
         return a->as_integer_class() > b->as_integer_class();
     }
-  
+
 };
 
 //! less operator (<) for Integers

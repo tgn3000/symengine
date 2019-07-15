@@ -84,23 +84,23 @@ void DenseMatrix::inv(MatrixBase &result) const
 // TGN: Symbolic substitution
 void DenseMatrix::subs(const map_basic_basic& m, MatrixBase &result) const
 {
-  result = *this;
-  for (unsigned int i = 0; i < row_; i++) {
-    for (unsigned int j = 0; j < col_; j++) {
-      result.set(i, j, this->get(i, j)->subs(m));
+    result = *this;
+    for (unsigned int i = 0; i < row_; i++) {
+        for (unsigned int j = 0; j < col_; j++) {
+            result.set(i, j, this->get(i, j)->subs(m));
+        }
     }
-  }
 }
 
 DenseMatrix DenseMatrix::subs(const map_basic_basic& m) const
 {
-  DenseMatrix result(row_, col_);
-  for (unsigned int i = 0; i < row_; i++) {
-    for (unsigned int j = 0; j < col_; j++) {
-      result.set(i, j, this->get(i, j)->subs(m));
+    DenseMatrix result(row_, col_);
+    for (unsigned int i = 0; i < row_; i++) {
+        for (unsigned int j = 0; j < col_; j++) {
+            result.set(i, j, this->get(i, j)->subs(m));
+        }
     }
-  }
-  return result;
+    return result;
 }
 
 void DenseMatrix::add_matrix(const MatrixBase &other, MatrixBase &result) const

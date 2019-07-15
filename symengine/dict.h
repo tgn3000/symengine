@@ -30,7 +30,7 @@ struct RCPIntegerKeyLess;
 
 // TGN adds
 struct RCPSymbolKeyEq;
-struct RCPSymbolKeyLess;   
+struct RCPSymbolKeyLess;
 struct ExpressionKeyEq;
 struct ExpressionKeyLess;
 // End of TGN's addition
@@ -58,7 +58,7 @@ typedef std::set<RCP<const Basic>, RCPBasicKeyLess> set_basic;
 typedef std::multiset<RCP<const Basic>, RCPBasicKeyLess> multiset_basic;
 // TGN adds
 typedef std::set<RCP<const Symbol>, RCPSymbolKeyLess> set_symbol;
-typedef std::multiset<RCP<const Symbol>, RCPSymbolKeyLess> multiset_symbol;  
+typedef std::multiset<RCP<const Symbol>, RCPSymbolKeyLess> multiset_symbol;
 typedef std::set<Expression, ExpressionKeyLess> set_expression;
 typedef std::multiset<Expression, ExpressionKeyLess> multiset_expression;
 // End of TGN's addition

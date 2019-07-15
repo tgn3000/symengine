@@ -119,7 +119,7 @@ struct RCPSymbolKeyLess {
     //! true if `x < y`, false otherwise
     bool operator()(const RCP<const Symbol> &x, const RCP<const Symbol> &y) const
     {
-        // const RCP<const Basic> x = x_s, y = y_s;      
+        // const RCP<const Basic> x = x_s, y = y_s;
         hash_t xh = x->hash(), yh = y->hash();
         if (xh != yh)
             return xh < yh;
@@ -127,7 +127,7 @@ struct RCPSymbolKeyLess {
             return false;
         return x->__cmp__(*y) == -1;
     }
-};  
+};
 
 } // SymEngine
 
