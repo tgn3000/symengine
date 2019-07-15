@@ -406,32 +406,6 @@ public:
             s, std::move(x.translate(trans, numeric_cast<unsigned>(s.size()))));
     }
 
-    static RCP<const Poly> from_dict2(const vec_basic &v,
-                                     const typename Container::dict_type &d)
-    {
-        set_basic s;
-        std::map<RCP<const Basic>, unsigned int, RCPBasicKeyLess> m;
-        // Symbols in the vector are sorted by placeing them in an map image
-        // of the symbols in the map is their original location in the vector
-
-        for (unsigned int i = 0; i < v.size(); i++) {
-            m.insert({v[i], i});
-            s.insert(v[i]);
-        }
-
-        // vec_uint translator represents the permutation of the exponents
-        vec_uint trans(s.size());
-        auto mptr = m.begin();
-        for (unsigned int i = 0; i < s.size(); i++) {
-            trans[mptr->second] = i;
-            mptr++;
-        }
-
-        Container x(d, numeric_cast<unsigned>(s.size()));
-        return Poly::from_container(
-                                    s, std::move(x.translate(trans, numeric_cast<unsigned>(s.size()))));
-    }  
-
     static Container container_from_dict(const set_basic &s,
                                          typename Container::dict_type &&d)
     {
@@ -534,9 +508,6 @@ set_basic get_translated_container(Container &x, Container &y, const Poly &a,
     set_basic s;
 
     unsigned int sz = reconcile(v1, v2, s, a.get_vars(), b.get_vars());
-
-    std::cout << "sz = " << sz << std::endl;
-    
     x = a.get_poly().translate(v1, sz);
     y = b.get_poly().translate(v2, sz);
 
