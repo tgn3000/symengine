@@ -534,9 +534,6 @@ set_basic get_translated_container(Container &x, Container &y, const Poly &a,
     set_basic s;
 
     unsigned int sz = reconcile(v1, v2, s, a.get_vars(), b.get_vars());
-
-    std::cout << "sz = " << sz << std::endl;
-    
     x = a.get_poly().translate(v1, sz);
     y = b.get_poly().translate(v2, sz);
 
