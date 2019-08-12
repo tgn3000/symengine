@@ -843,6 +843,7 @@ const std::string &LLVMDoubleVisitor::dumps() const
 
 void LLVMDoubleVisitor::loads(const std::string &s)
 {
+    membuffer = s;
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
     llvm::InitializeNativeTargetAsmParser();
@@ -914,6 +915,17 @@ void LLVMDoubleVisitor::bvisit(const Ceiling &x)
     llvm::Function *fun;
     args.push_back(apply(*x.get_arg()));
     fun = get_double_intrinsic(llvm::Intrinsic::ceil, 1, mod);
+    auto r = builder->CreateCall(fun, args);
+    r->setTailCall(true);
+    result_ = r;
+}
+
+void LLVMDoubleVisitor::bvisit(const Truncate &x)
+{
+    std::vector<llvm::Value *> args;
+    llvm::Function *fun;
+    args.push_back(apply(*x.get_arg()));
+    fun = get_double_intrinsic(llvm::Intrinsic::trunc, 1, mod);
     auto r = builder->CreateCall(fun, args);
     r->setTailCall(true);
     result_ = r;

@@ -149,6 +149,9 @@ public:
                 Add::coef_dict_add_term(outArg(coef), dict, p.second, coeff_);
             }
         }
+        if (eq(*zero, *n_)) {
+            iaddnum(outArg(coef), x.get_coef());
+        }
         coeff_ = Add::from_dict(coef, std::move(dict));
     }
 
@@ -317,6 +320,10 @@ inline set_basic atoms(const Basic &b)
 
 class CountOpsVisitor : public BaseVisitor<CountOpsVisitor>
 {
+protected:
+    std::unordered_map<RCP<const Basic>, unsigned, RCPBasicHash, RCPBasicKeyEq>
+        v;
+
 public:
     unsigned count = 0;
     void apply(const Basic &b);
