@@ -69,6 +69,12 @@ public:
     // Fraction free LDU factorization
     virtual void FFLDU(MatrixBase &L, MatrixBase &D, MatrixBase &U) const = 0;
 
+    // QR factorization
+    virtual void QR(MatrixBase &Q, MatrixBase &R) const = 0;
+
+    // Cholesky decomposition
+    virtual void cholesky(MatrixBase &L) const = 0;
+
     // Solve Ax = b using LU factorization
     virtual void LU_solve(const MatrixBase &b, MatrixBase &x) const = 0;
 };
@@ -153,19 +159,25 @@ public:
     // Fraction free LDU factorization
     virtual void FFLDU(MatrixBase &L, MatrixBase &D, MatrixBase &U) const;
 
+    // QR factorization
+    virtual void QR(MatrixBase &Q, MatrixBase &R) const;
+
+    // Cholesky decomposition
+    virtual void cholesky(MatrixBase &L) const;
+
     // Return the Jacobian of the matrix
     friend void jacobian(const DenseMatrix &A, const DenseMatrix &x,
-                         DenseMatrix &result);
+                         DenseMatrix &result, bool diff_cache);
     // Return the Jacobian of the matrix using sdiff
     friend void sjacobian(const DenseMatrix &A, const DenseMatrix &x,
-                          DenseMatrix &result);
+                          DenseMatrix &result, bool diff_cache);
 
     // Differentiate the matrix element-wise
     friend void diff(const DenseMatrix &A, const RCP<const Symbol> &x,
-                     DenseMatrix &result);
+                     DenseMatrix &result, bool diff_cache);
     // Differentiate the matrix element-wise using SymPy compatible diff
     friend void sdiff(const DenseMatrix &A, const RCP<const Basic> &x,
-                      DenseMatrix &result);
+                      DenseMatrix &result, bool diff_cache);
 
     // Friend functions related to Matrix Operations
     friend void add_dense_dense(const DenseMatrix &A, const DenseMatrix &B,
@@ -356,6 +368,12 @@ public:
     // Fraction free LDU factorization
     virtual void FFLDU(MatrixBase &L, MatrixBase &D, MatrixBase &U) const;
 
+    // QR factorization
+    virtual void QR(MatrixBase &Q, MatrixBase &R) const;
+
+    // Cholesky decomposition
+    virtual void cholesky(MatrixBase &L) const;
+
     static void csr_sum_duplicates(std::vector<unsigned> &p_,
                                    std::vector<unsigned> &j_, vec_basic &x_,
                                    unsigned row_);
@@ -380,8 +398,10 @@ public:
                               const std::vector<unsigned> &i,
                               const std::vector<unsigned> &j,
                               const vec_basic &x);
-    static CSRMatrix jacobian(const vec_basic &exprs, const vec_sym &x);
-    static CSRMatrix jacobian(const DenseMatrix &A, const DenseMatrix &x);
+    static CSRMatrix jacobian(const vec_basic &exprs, const vec_sym &x,
+                              bool diff_cache = true);
+    static CSRMatrix jacobian(const DenseMatrix &A, const DenseMatrix &x,
+                              bool diff_cache = true);
 
     friend void csr_matmat_pass1(const CSRMatrix &A, const CSRMatrix &B,
                                  CSRMatrix &C);
@@ -406,16 +426,18 @@ private:
 };
 
 // Return the Jacobian of the matrix
-void jacobian(const DenseMatrix &A, const DenseMatrix &x, DenseMatrix &result);
+void jacobian(const DenseMatrix &A, const DenseMatrix &x, DenseMatrix &result,
+              bool diff_cache = true);
 // Return the Jacobian of the matrix using sdiff
-void sjacobian(const DenseMatrix &A, const DenseMatrix &x, DenseMatrix &result);
+void sjacobian(const DenseMatrix &A, const DenseMatrix &x, DenseMatrix &result,
+               bool diff_cache = true);
 
 // Differentiate all the elements
-void diff(const DenseMatrix &A, const RCP<const Symbol> &x,
-          DenseMatrix &result);
+void diff(const DenseMatrix &A, const RCP<const Symbol> &x, DenseMatrix &result,
+          bool diff_cache = true);
 // Differentiate all the elements using SymPy compatible diff
-void sdiff(const DenseMatrix &A, const RCP<const Basic> &x,
-           DenseMatrix &result);
+void sdiff(const DenseMatrix &A, const RCP<const Basic> &x, DenseMatrix &result,
+           bool diff_cache = true);
 
 // Get submatrix from a DenseMatrix
 void submatrix_dense(const DenseMatrix &A, DenseMatrix &B, unsigned row_start,
@@ -437,8 +459,9 @@ void cross(const DenseMatrix &A, const DenseMatrix &B, DenseMatrix &C);
 
 // Matrix Factorization
 void LU(const DenseMatrix &A, DenseMatrix &L, DenseMatrix &U);
-
 void LDL(const DenseMatrix &A, DenseMatrix &L, DenseMatrix &D);
+void QR(const DenseMatrix &A, DenseMatrix &Q, DenseMatrix &R);
+void cholesky(const DenseMatrix &A, DenseMatrix &L);
 
 // Inverse
 void inverse_fraction_free_LU(const DenseMatrix &A, DenseMatrix &B);

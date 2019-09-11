@@ -5,8 +5,8 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE ${CMAKE_SOURCE_DIR}/cmake/UserOverride.cmake)
 project(symengine)
 
 set(SYMENGINE_MAJOR_VERSION 0)
-set(SYMENGINE_MINOR_VERSION 4)
-set(SYMENGINE_PATCH_VERSION 1)
+set(SYMENGINE_MINOR_VERSION 5)
+set(SYMENGINE_PATCH_VERSION 0)
 set(SYMENGINE_VERSION ${SYMENGINE_MAJOR_VERSION}.${SYMENGINE_MINOR_VERSION}.${SYMENGINE_PATCH_VERSION})
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -87,6 +87,9 @@ if (${EXCLUDE_LIBS})
 else()
     message(STATUS "Linker does not support --exclude-libs")
 endif()
+
+include(CheckTypeSize)
+check_type_size("long double" SYMENGINE_SIZEOF_LONG_DOUBLE)
 
 set(HAVE_GCC_ABI_DEMANGLE yes
     CACHE BOOL "Build with C++ name demangling support")
@@ -275,14 +278,14 @@ endif()
 # Parser
 set(WITH_GENERATE_PARSER no CACHE BOOL "Generate parser files")
 if (WITH_GENERATE_PARSER)
-    find_program(BISONCPP_EXECUTABLE bisonc++)
-    find_program(FLEXCPP_EXECUTABLE flexc++)
+    find_program(BISON_EXECUTABLE bison)
+    find_program(RE2C_EXECUTABLE re2c)
 
-    if ("${BISONCPP_EXECUTABLE}" STREQUAL "BISONCPP_EXECUTABLE-NOTFOUND")
-        message(FATAL_ERROR "bisonc++ not found!")
+    if ("${BISON_EXECUTABLE}" STREQUAL "BISON_EXECUTABLE-NOTFOUND")
+        message(FATAL_ERROR "bison not found!")
     endif()
-    if ("${FLEXCPP_EXECUTABLE}" STREQUAL "FLEXCPP_EXECUTABLE-NOTFOUND")
-        message(FATAL_ERROR "flexc++ not found!")
+    if ("${RE2C_EXECUTABLE}" STREQUAL "RE2C_EXECUTABLE-NOTFOUND")
+        message(FATAL_ERROR "re2c not found!")
     endif()
 endif()
 
