@@ -167,3 +167,9 @@ symengine/symengine_config_cling.h
 
 # IDE related
 /.idea
+
+# TGN's gitignore
+*#*
+*~*
+symengine/html/
+symengine/latex/

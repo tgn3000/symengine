@@ -28,6 +28,13 @@ struct RCPBasicKeyEq;
 struct RCPBasicKeyLess;
 struct RCPIntegerKeyLess;
 
+// begin of TGN
+struct RCPSymbolKeyEq;
+struct RCPSymbolKeyLess;   
+struct ExpressionKeyEq;
+struct ExpressionKeyLess;
+// end of TGN
+
 bool eq(const Basic &, const Basic &);
 typedef uint64_t hash_t;
 typedef std::unordered_map<RCP<const Basic>, RCP<const Number>, RCPBasicHash,
@@ -49,6 +56,12 @@ typedef std::vector<integer_class> vec_integer_class;
 typedef std::vector<RCP<const Symbol>> vec_sym;
 typedef std::set<RCP<const Basic>, RCPBasicKeyLess> set_basic;
 typedef std::multiset<RCP<const Basic>, RCPBasicKeyLess> multiset_basic;
+// begin of TGN
+typedef std::set<RCP<const Symbol>, RCPSymbolKeyLess> set_symbol;
+typedef std::multiset<RCP<const Symbol>, RCPSymbolKeyLess> multiset_symbol;  
+typedef std::set<Expression, ExpressionKeyLess> set_expression;
+typedef std::multiset<Expression, ExpressionKeyLess> multiset_expression;
+// end of TGN
 typedef std::map<vec_uint, unsigned long long int> map_vec_uint;
 typedef std::map<vec_uint, integer_class> map_vec_mpz;
 typedef std::map<RCP<const Basic>, RCP<const Number>, RCPBasicKeyLess>

@@ -272,7 +272,90 @@ public:
     {
         return m_basic;
     }
+
+    // begin of TGN
+    //! Overload Sin
+    friend Expression sin(const Expression &a)
+    {
+      return Expression(sin(a.m_basic));
+    }
+    //! Overload Cos
+    friend Expression cos(const Expression &a)
+    {
+      return Expression(cos(a.m_basic));
+    }
+    //! Overload Tan
+    friend Expression tan(const Expression &a)
+    {
+      return Expression(tan(a.m_basic));
+    }
+    //! Overload Asin
+    friend Expression asin(const Expression &a)
+    {
+      return Expression(asin(a.m_basic));
+    }
+    //! Overload Acos
+    friend Expression acos(const Expression &a)
+    {
+      return Expression(acos(a.m_basic));
+    }
+    //! Overload Atan
+    friend Expression atan(const Expression &a)
+    {
+      return Expression(atan(a.m_basic));
+    }
+    //! Overload Atan2
+    friend Expression atan2(const Expression &a, const Expression &b)
+    {
+      return Expression(atan2(a.m_basic, b.m_basic));
+    }
+    //! Overload Abs
+    friend Expression abs(const Expression &a)
+    {
+      return Expression(abs(a.m_basic));
+    }
+    //! Overload Sqrt
+    friend Expression sqrt(const Expression &a)
+    {
+      return Expression(sqrt(a.m_basic));
+    }
 };
+
+//! Our hash:
+struct ExpressionHash {
+    //! Returns the hashed value.
+    size_t operator()(const Expression &k_ex) const
+    {
+      const RCP<const Basic> k = k_ex.get_basic();
+      return k->hash();
+    }
+};  
+
+//! Our comparison `(==)`
+struct ExpressionKeyEq {
+    //! Comparison Operator `==`
+    bool operator()(const Expression &x_ex, const Expression &y_ex) const
+    {
+      const RCP<const Basic> x = x_ex.get_basic(), y = y_ex.get_basic();
+      return eq(*x, *y);
+    }
+};
+
+//! Our less operator `(<)`:
+struct ExpressionKeyLess {
+    //! true if `x < y`, false otherwise
+    bool operator()(const Expression &x_ex, const Expression &y_ex) const
+    {
+      const RCP<const Basic> x = x_ex.get_basic(), y = y_ex.get_basic();      
+      hash_t xh = x->hash(), yh = y->hash();
+        if (xh != yh)
+            return xh < yh;
+        if (eq(*x, *y))
+            return false;
+        return x->__cmp__(*y) == -1;
+    }
+};
+// end of TGN
 
 inline Expression pow(const Expression &base, const Expression &exp)
 {

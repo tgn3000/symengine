@@ -118,6 +118,11 @@ public:
     virtual RCP<const Basic> det() const;
     virtual void inv(MatrixBase &result) const;
 
+    // begin of TGN
+    virtual void subs(const map_basic_basic& m, MatrixBase &result) const;
+    virtual DenseMatrix subs(const map_basic_basic& m) const;
+    // end of TGN
+
     // Matrix addition
     virtual void add_matrix(const MatrixBase &other, MatrixBase &result) const;
 
