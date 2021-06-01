@@ -16,7 +16,9 @@ wrappers allow usage of the library from other languages, e.g.:
 
 ## Try SymEngine
 
-Run an interactive C++ session with SymEngine using [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/symengine/symengine/master?filepath=notebooks%2Fsymengine.ipynb).
+Tutorials are at [SymEngine.org](https://symengine.org/design/design.html).
+
+Run an interactive C++ session with SymEngine using [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/symengine/symengine/master?filepath=docs/mystMD/firststeps.myst.md).
 
 ## License
 
@@ -117,6 +119,7 @@ their default values indicated below:
         -DBUILD_TESTS:BOOL=ON \                       # Build with tests
         -DBUILD_BENCHMARKS:BOOL=ON \                  # Build with benchmarks
         -DBUILD_BENCHMARKS_NONIUS:BOOL=OFF \          # Build with Nonius benchmarks
+        -DBUILD_BENCHMARKS_GOOGLE:BOOL=OFF \          # Build with Google Benchmark benchmarks
         -DINTEGER_CLASS:STRING=gmp \                  # Choose storage type for Integer. one of gmp, gmpxx,
                                                         flint, piranha, boostmp
         -DBUILD_SHARED_LIBS:BOOL=OFF \                # Build a shared library.
@@ -185,6 +188,6 @@ To build with more optimizations, you can use the above dependencies and options
 
 ## Developer Documentation
 
-Please follow the [C++ Style Guide](doc/style_guide.md) when developing.
+Please follow the [C++ Style Guide](docs/Doxygen/md/style_guide.md) when developing.
 
-The design decisions are documented in [Design](doc/design.md).
+The design decisions are documented in [Design](https://symengine.org/design/design.html).

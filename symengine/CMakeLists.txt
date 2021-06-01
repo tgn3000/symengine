@@ -78,6 +78,7 @@ set(SRC
     symbol.cpp
     symengine_rcp.cpp
     visitor.cpp
+    test_visitors.cpp
 )
 
 if ("${SYMENGINE_INTEGER_CLASS}" STREQUAL "BOOSTMP")
@@ -190,6 +191,7 @@ set(HEADERS
     symengine_rcp.h
     type_codes.inc
     visitor.h
+    test_visitors.h
 )
 
 include(GNUInstallDirs)
@@ -238,6 +240,10 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set_source_files_properties(parser/parser.tab.cc PROPERTIES COMPILE_FLAGS "-Wno-conversion")
 endif()
 
+if (WITH_LLVM AND NOT ${LLVM_VERSION} VERSION_LESS "10.0.0")
+    set_target_properties(symengine PROPERTIES CXX_STANDARD 14 CXX_EXTENSIONS OFF CXX_STANDARD_REQUIRED yes)
+endif()
+
 if (WITH_SYMENGINE_TEUCHOS)
     target_link_libraries(symengine teuchos)
 endif()
@@ -259,6 +265,7 @@ install(TARGETS symengine
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         )
 install(FILES
     "${symengine_BINARY_DIR}/symengine/symengine_config.h"

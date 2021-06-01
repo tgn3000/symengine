@@ -2,6 +2,7 @@
 #include <symengine/pow.h>
 #include <symengine/complex.h>
 #include <symengine/symengine_exception.h>
+#include <symengine/test_visitors.h>
 
 namespace SymEngine
 {
@@ -77,7 +78,7 @@ bool Mul::is_canonical(const RCP<const Number> &coef,
 
 hash_t Mul::__hash__() const
 {
-    hash_t seed = MUL;
+    hash_t seed = SYMENGINE_MUL;
     hash_combine<Basic>(seed, *coef_);
     for (const auto &p : dict_) {
         hash_combine<Basic>(seed, *(p.first));
@@ -166,8 +167,7 @@ void Mul::dict_add_term(map_basic_basic &d, const RCP<const Basic> &exp,
         } else {
             // General case:
             it->second = add(it->second, exp);
-            if (is_a_Number(*it->second)
-                and down_cast<const Number &>(*(it->second)).is_zero()) {
+            if (is_number_and_zero(*it->second)) {
                 d.erase(it);
             }
         }
@@ -425,8 +425,8 @@ RCP<const Basic> mul(const vec_basic &a)
 
 RCP<const Basic> div(const RCP<const Basic> &a, const RCP<const Basic> &b)
 {
-    if (is_a_Number(*b) and down_cast<const Number &>(*b).is_zero()) {
-        if (is_a_Number(*a) and down_cast<const Number &>(*a).is_zero()) {
+    if (is_number_and_zero(*b)) {
+        if (is_number_and_zero(*a)) {
             return Nan;
         } else {
             return ComplexInf;
@@ -443,7 +443,7 @@ RCP<const Basic> neg(const RCP<const Basic> &a)
 void Mul::power_num(const Ptr<RCP<const Number>> &coef, map_basic_basic &d,
                     const RCP<const Number> &exp) const
 {
-    if (is_a_Number(*exp) and down_cast<const Number &>(*exp).is_zero()) {
+    if (exp->is_zero()) {
         // (x*y)**(0.0) should return 1.0
         imulnum(coef, pownum(rcp_static_cast<const Number>(exp), zero));
         return;
